@@ -1,12 +1,12 @@
 import requests
 
 def currency_support():
-    values_cur_id = input('Введите Cur_ID валюты: ')
-    return values_cur_id
+    values_cur_alpha = input('Введите валюту: ')
+    return values_cur_alpha
 
-#currency_id = currency_support()
+currency_alpha = currency_support()
 
-data = requests.get('https://www.nbrb.by/api/exrates/rates/USD', data = {'parammode':'2'})
+data = requests.get('https://www.nbrb.by/api/exrates/rates/' + currency_alpha + '?parammode=2')
 data_json = data.json()
 
 print(data_json['Cur_OfficialRate'])
