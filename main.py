@@ -1,12 +1,19 @@
 import requests
 
-def currency_support():
-    values_cur_alpha = input('Введите валюту: ')
-    return values_cur_alpha
+try:
 
-currency_alpha = currency_support()
+    def currency_support():
+        values_cur_alpha = input('Введите валюту: ')
+        return values_cur_alpha
 
-data = requests.get('https://www.nbrb.by/api/exrates/rates/' + currency_alpha + '?parammode=2')
-data_json = data.json()
+    currency_alpha = currency_support()
 
-print(data_json['Cur_OfficialRate'])
+    data = requests.get('https://www.nbrb.by/api/exrates/rates/' + currency_alpha + '?parammode=2')
+    data_json = data.json()
+
+    print(data_json['Cur_Abbreviation'], end=': ')
+    print(data_json['Cur_OfficialRate'])
+
+except requests.exceptions.ConnectionError:
+    print('Error: no internet connection')
+
