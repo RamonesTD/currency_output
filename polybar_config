@@ -1,0 +1,7 @@
+# To use this script in polybar, please include into your polybar config this module:
+
+[module/currency]
+type = custom/script
+exec = sh ~/.config/polybar/currency_output/run.sh
+interval = 3600
+
