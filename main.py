@@ -1,12 +1,22 @@
-import requests
+import requests, configparser
+
+config = configparser.ConfigParser()
+config.read('config')
+
+list = []
+currency_alpha = (config["currency_alpha"]["value"])
+list = currency_alpha.replace(' ','').split(',')
 
 try:
 
-    data = requests.get('https://www.nbrb.by/api/exrates/rates/145')
-    data_json = data.json()
+    for value in list:
 
-    print(data_json['Cur_Abbreviation'], end=': ')
-    print(data_json['Cur_OfficialRate'])
+        data = requests.get('https://www.nbrb.by/api/exrates/rates/' + value + '?parammode=2')
+        data_json = data.json()
+
+        print(data_json['Cur_Abbreviation'], end=': ')
+        print(data_json['Cur_OfficialRate'])
 
 except requests.exceptions.ConnectionError:
     print('Error: no internet connection')
+
