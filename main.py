@@ -1,5 +1,7 @@
 import requests, configparser
 
+getByCurrencyURL = 'https://www.nbrb.by/api/exrates/rates/{currency}?parammode=2'
+
 config = configparser.ConfigParser()
 config.read('config')
 
@@ -11,7 +13,7 @@ try:
 
     for value in list:
 
-        data = requests.get('https://www.nbrb.by/api/exrates/rates/' + value + '?parammode=2')
+        data = requests.get(getByCurrencyURL.replace('{currency}', value))
         data_json = data.json()
 
         print(data_json['Cur_Abbreviation'], end=': ')
