@@ -1,2 +1,7 @@
-[currency_alpha]
-value=USD, RUB, EUR
+[Global]
+currency=USD, RUB, EUR
+# Is need compare today currency with yesterday currency: true/false
+# To use this option you need to install 'Font Awesome' in your system
+compare=false
+# View in one line or each currency for each row: inline / block
+output=inline

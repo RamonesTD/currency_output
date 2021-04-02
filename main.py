@@ -1,22 +1,62 @@
-import requests, configparser
+import requests, configparser, datetime, json
 
-config = configparser.ConfigParser()
-config.read('config')
+getByCurrencyAndDateURL = 'https://www.nbrb.by/api/exrates/rates/{currency}?parammode=2&ondate={date}'
 
 list = []
-currency_alpha = (config["currency_alpha"]["value"])
-list = currency_alpha.replace(' ','').split(',')
+compare = False
+output = "block"
 
-try:
+def getDataByCurrencyAndDate(currency, date):
+    try:
+        url = getByCurrencyAndDateURL.replace('{currency}', currency.lower()).replace('{date}', date.strftime("%Y-%m-%d"))
+        data = requests.get(url)
+        return data.json()
+    except requests.exceptions.ConnectionError:
+        print('Error: no internet connection')
 
-    for value in list:
+def getAbbreviation(data):
+    return data['Cur_Abbreviation']
 
-        data = requests.get('https://www.nbrb.by/api/exrates/rates/' + value + '?parammode=2')
-        data_json = data.json()
+def getRate(data):
+    return data['Cur_OfficialRate']
 
-        print(data_json['Cur_Abbreviation'], end=': ')
-        print(data_json['Cur_OfficialRate'])
+def printData(data, end):
+    global output
+    if output == "block":
+        print(getAbbreviation(data), end=': ')
+        print(getRate(data), end='\n')
+    elif output == "inline":
+        print(getAbbreviation(data), end=': ')
+        print(getRate(data), end=end+' ')
 
-except requests.exceptions.ConnectionError:
-    print('Error: no internet connection')
+def setParamsFromConfig():
+    config = configparser.ConfigParser()
+    config.read('config')
+    
+    currency_alpha = (config["Global"]["currency"])
+    global list
+    list = currency_alpha.replace(' ','').split(',')
+    global compare
+    compare = config["Global"]["compare"].lower() == "true"
+    global output
+    output = config["Global"]["output"]
+
+setParamsFromConfig()
+for value in list:
+    if compare:
+        today = datetime.date.today()
+        prewDay = datetime.date.today() - datetime.timedelta(days = 1)
+        dataToday = getDataByCurrencyAndDate(value, today)
+        dataPrew = getDataByCurrencyAndDate(value, prewDay)
+        if dataToday is not None and dataPrew is not None:
+            if getRate(dataToday) > getRate(dataPrew):
+                printData(dataToday, '')
+            elif  getRate(dataToday) < getRate(dataPrew):
+                printData(dataToday, '')
+            else:
+                printData(dataToday, '')
+    else:
+        dataToday = getDataByCurrencyAndDate(value, datetime.date.today())
+        if dataToday is not None:
+            printData(dataToday, '')
 
